@@ -8,6 +8,9 @@ public class Player : MonoBehaviour, IKitchenObjectParent
 
     public static Player Instance { get; private set; }
 
+    //event za zvuk
+    public event EventHandler OnPickSomething;
+
 
     public event EventHandler<OnSelectedCounterChangedEventArgs> OnSelectedCounterChanged;
     public class OnSelectedCounterChangedEventArgs : EventArgs
@@ -48,7 +51,8 @@ public class Player : MonoBehaviour, IKitchenObjectParent
 
     private void GameInput_OnInteractAlternateAction(object sender, EventArgs e)
     {
-
+        if (!KitchenGameManager.Instance.IsGamePlaying())
+            return;
         if (selectedCounter != null)
         {
             selectedCounter.InteractAlternate(this);
@@ -60,8 +64,10 @@ public class Player : MonoBehaviour, IKitchenObjectParent
 
     private void GameInput_OnInteractAction(object sender, System.EventArgs e)
     {
-
-       if(selectedCounter != null)
+        //ako igra nije u gameplaying statu ne mozemo imati interakcije
+        if (!KitchenGameManager.Instance.IsGamePlaying())
+            return;
+        if (selectedCounter != null)
         {
             selectedCounter.Interact(this);
 
@@ -214,6 +220,13 @@ public class Player : MonoBehaviour, IKitchenObjectParent
 
     public void SetKitchenObj(KitchenObj kitchenObj)
     {
+
+        if(kitchenObj != null)
+        { // znaci pokupio je igrac nesto
+            //za sfx event
+            OnPickSomething?.Invoke(this,EventArgs.Empty); 
+
+        }
         this.kitchenObj = kitchenObj;
     }
 
